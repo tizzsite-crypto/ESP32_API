@@ -1,28 +1,24 @@
 <?php
-// Recibe datos del ESP32
-$user = isset($_GET['user']) ? $_GET['user'] : '';
-$broker = isset($_GET['broker']) ? $_GET['broker'] : '';
+$user = $_GET['user'] ?? '';
+$broker = $_GET['broker'] ?? '';
 
-if (empty($user) || empty($broker)) {
+if (!$user || !$broker) {
     echo "Error: parámetros incompletos";
     exit;
 }
 
-// URL de InfinityFree
-$infinityfree_url = "https://tizirobotics.wuaze.com/tposturegym/update.php?user=" . urlencode($user) . "&broker=" . urlencode($broker);
+// URL de update.php en InfinityFree
+$url = "https://tizirobotics.wuaze.com/tposturegym/update.php?user=" . urlencode($user) . "&broker=" . urlencode($broker);
 
-// Llamada cURL a InfinityFree
+// cURL con User-Agent para “engañar” un poco al AEJS
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $infinityfree_url);
+curl_setopt($ch, CURLOPT_URL, $url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0");
 $response = curl_exec($ch);
-$curl_error = curl_error($ch);
 curl_close($ch);
 
-// Devuelve respuesta al ESP32
-if ($response) {
-    echo $response;
-} else {
-    echo "❌ Error en cURL: $curl_error";
-}
+// Mostrar solo la respuesta
+echo $response;
 ?>
+
